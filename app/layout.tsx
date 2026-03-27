@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { ClerkProvider, Show, SignInButton } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { PulseSignOutButton } from "@/components/PulseSignOutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +25,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      >
+        <body className="min-h-full flex flex-col">
+          <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-black">
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              Pulse
+            </div>
+            <div className="flex items-center gap-2">
+              <Show when="signed-out">
+                <SignInButton mode="modal">
+                  <button
+                    type="button"
+                    className="inline-flex h-9 items-center justify-center rounded-md bg-zinc-900 px-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    Sign in
+                  </button>
+                </SignInButton>
+              </Show>
+              <Show when="signed-in">
+                <PulseSignOutButton />
+              </Show>
+            </div>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

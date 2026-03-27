@@ -203,7 +203,7 @@ const groq = new Groq({
   {
     "ticketKey": "PWP-1 or null if no match",
     "confidence": "high/medium/low",
-    "reasoning": "one sentence detailed explanation"
+    "reasoning": "one sentence very detailed explanation of why you think this commit relates to the ticket"
   }`
   
     const response = await groq.chat.completions.create({

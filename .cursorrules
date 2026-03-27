@@ -1,0 +1,96 @@
+# PROJECT
+You are helping build Pulse — an AI engineering co-pilot that watches a developer's
+Jira sprint, monitors GitHub commits, and communicates via voice.
+
+# STACK
+- Next.js 14 App Router (TypeScript)
+- Tailwind CSS (styling only, no CSS modules or styled-components)
+- Clerk (auth — middleware already configured)
+- Groq llama-3.3-70b (LLM + tool-calling)
+- Deepgram (STT via WebSocket, TTS via REST)
+- Jira REST API v3 + Agile API v1
+- GitHub Webhooks + REST API
+
+# ARCHITECTURE RULES
+- All API keys stay server-side. Never in client components or exposed to browser
+- All Jira logic lives in lib/jira.ts only
+- All Groq/agent logic lives in lib/agent.ts only
+- All Deepgram logic lives in lib/deepgram.ts only
+- API routes live in app/api/*/route.ts
+- Client components are in components/ and marked 'use client'
+- Server components are in app/ and have no 'use client' directive
+
+# CODE STYLE
+- TypeScript strict mode — no 'any' types, ever
+- async/await only — never .then() or .catch()
+- Named exports for components, default exports for pages
+- Always handle errors explicitly — no silent catches
+- Environment variables accessed via process.env only, never hardcoded
+- Always type API responses — never assume shape
+
+# NEXT.JS SPECIFIC
+- App Router only — never suggest Pages Router patterns
+- Use server actions for form mutations if needed
+- Route handlers use NextRequest and NextResponse
+- Middleware lives in middleware.ts at root only
+
+# GROQ / AGENT RULES
+- Tool definitions are typed with a ToolDefinition interface
+- Agent always runs in a loop until tool_calls is empty
+- Never call Groq from a client component
+- Tool results must be passed back in the messages array as role: "tool"
+- Always include a system prompt that explains Pulse's persona
+
+# JIRA RULES
+- Auth is Basic — base64 of email:api_token
+- Ticket transitions require fetching transition IDs first — never hardcode them
+- Always use the Agile API for sprint data (/rest/agile/1.0)
+- Use REST API v3 for ticket operations (/rest/api/3)
+- Board ID and Sprint ID come from environment variables
+
+# DEEPGRAM RULES
+- STT uses WebSocket connection from the client via the Deepgram JS SDK
+- TTS is a REST call server-side — returns audio buffer
+- Never stream audio directly from the client to external APIs
+- Deepgram API key is server-side only — expose via /api/deepgram/token if needed
+
+# GITHUB WEBHOOK RULES
+- Always validate webhook signature using GITHUB_WEBHOOK_SECRET
+- Webhook handler lives in app/api/webhooks/github/route.ts only
+- Parse push events only — ignore all other event types for now
+- Map commits to tickets by matching commit message + changed files to Jira ticket keys
+
+# TESTING EACH STAGE
+- Stage 1 complete: GET /api/sprint returns structured Jira sprint data
+- Stage 2 complete: Agent receives text, calls Jira tool, ticket updates in Jira
+- Stage 3 complete: /api/tts returns audio, browser plays it
+- Stage 4 complete: Mic input transcribes and routes to agent successfully
+- Stage 5 complete: GitHub push triggers webhook, stale ticket appears in UI
+- Stage 6 complete: App live on Cloud Run with all env vars from Secret Manager
+
+# DEVELOPER CONTEXT
+- Developer is experienced in Node.js, TypeScript, Express, GCP
+- Developer is learning Next.js App Router — explain any non-obvious Next.js patterns
+- Developer is learning Docker and Cloud Run — explain Dockerfile decisions
+- Do not over-explain TypeScript or async patterns — these are already known
+- Focus explanations on: why this API works this way, what would change in production
+
+# SCOPE CONSTRAINTS
+- One Jira project only
+- One GitHub repo only — watching main branch
+- No database this week — Jira and GitHub are source of truth
+- No mobile — web only
+- Do not suggest adding features outside the 6 stages above
+
+# WHEN DEBUGGING
+- Always ask to see the full error message and the relevant file before suggesting a fix
+- Do not refactor files that are not related to the current problem
+- If a Groq tool-call fails, check the tool schema shape first
+- If a Jira call returns 404, check the endpoint version (v2 vs v3 vs agile)
+- If a Deepgram connection fails, check if the API key is being passed server-side
+
+# PERSONA
+Pulse speaks in a calm, direct developer voice.
+It is not overly enthusiastic. It does not say "Great question!"
+Morning briefs are concise — ticket key, title, status, days open.
+Stale alerts are direct — "JR-142 has had no commits for 3 days."

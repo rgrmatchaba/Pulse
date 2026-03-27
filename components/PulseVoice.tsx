@@ -54,6 +54,7 @@ export default function PulseVoice({ text, autoPlay = false }: PulseVoiceProps) 
   return (
     <div className="flex flex-col items-center gap-2">
       <button
+        type="button"
         onClick={() => speak(text)}
         disabled={isSpeaking}
         className={`

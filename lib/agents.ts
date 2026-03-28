@@ -198,7 +198,7 @@ const groq = new Groq({
   Open Jira tickets:
   ${tickets.map(t => `- ${t.key}: ${t.summary} (status: ${t.status})`).join('\n')}
   
-  Based on the commit message and files changed, which ticket does this commit most likely relate to?
+  Based on the commit message and files changed, which Jira ticket does this commit most likely relate to?
   Respond with JSON only in this exact format:
   {
     "ticketKey": "PWP-1 or null if no match",

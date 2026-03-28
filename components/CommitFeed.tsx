@@ -16,6 +16,7 @@ export default function CommitFeed() {
 
   const fetchCommits = async () => {
     const res = await fetch('/api/webhooks/github')
+    console.log(res.json());
     const data = await res.json()
     setCommits(data.commits)
   }

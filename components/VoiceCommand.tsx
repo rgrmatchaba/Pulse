@@ -247,6 +247,7 @@ export default function VoiceCommand({
 
       {/* Mic button — hold to speak */}
       <button
+        type="button"
         onMouseDown={startListening}
         onMouseUp={stopListening}
         onTouchStart={startListening}
